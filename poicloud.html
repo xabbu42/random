@@ -1,0 +1,70 @@
+<html>
+	<head>
+		<script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js" />
+		<script src="https://spectorcdn.babylonjs.com/spector.bundle.js" />
+		<style>
+			body { margin: 0; padding: 0; }
+			#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+		</style>
+	</head>
+	<body>
+		<div id="map"></div>
+		<div>
+			<input type="checkbox" id="sorted" name="scales">
+			<label for="sorted">Sorted</label>
+		</div>
+		<script>
+			var map = new maplibregl.Map({
+				container: 'map',
+				style: {
+					version: 8,
+					sources: {
+						earthquakes: {
+							type: 'geojson',
+							data: 'https://maplibre.org/maplibre-gl-js-docs/assets/earthquakes.geojson',
+						}
+					},
+					sprite: 'https://demotiles.maplibre.org/styles/osm-bright-gl-style/sprite',
+					glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
+					layers: [{
+						id: 'symbols',
+						type: 'symbol',
+						source: 'earthquakes',
+						layout: {
+							'icon-image': 'circle_11',
+							'icon-size': 2,
+							"icon-allow-overlap": true,
+							"icon-ignore-placement": true,
+							"text-allow-overlap": true,
+							"text-ignore-placement": true,
+							"text-field": "E",
+							'text-size': 12,
+						},
+						paint: {
+							'text-color': 'red'
+						}
+					}]
+				},
+				center: [-103.59179687498357, 40.66995747013945],
+				zoom: 3
+			});
+
+			map.on('load', function() {
+				document
+					.getElementById('sorted')
+					.addEventListener('change', function(event) {
+						const style = map.getStyle();
+						if (event.target.checked)
+							style.layers[0].layout['symbol-sort-key'] = ['get', 'mag'];
+						else
+							delete style.layers[0].layout['symbol-sort-key'];
+						map.setStyle(style);
+					});
+			});
+
+
+			var spector = new SPECTOR.Spector();
+			spector.displayUI();
+		</script>
+	</body>
+</html>
